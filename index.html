@@ -13,15 +13,23 @@
     let t = 0;
     let r = 0;
     let n = 0;
-    function calc() {
+    function setVars() {
         i = document.getElementById("importo").value;
         t = document.getElementById("tasso").value / 1200;
+    }
+    function calcRata() {
+        n = document.getElementById("anni").value * 12;
+        document.getElementById("rata").value = i*t*((1+t)**n)/(((1+t)**n)-1);
+    }
+    function calc() {
         r = document.getElementById("rata").value;
-        n = document.getElementById("rate").value;
+        document.getElementById("rata").value = parseFloat(r).toFixed(2);
         let c = i;
         let k = 0;
         let ia = 0;
         let da = 0;
+        let ic = 0;
+        let dc = 0;
         document.getElementById("tabout").innerHTML = "<tr><th> Anni </th><th> Mesi </th><th> Quota interesse </th><th> Quota capitale </th><th> Capitale residuo </th></tr>";
         while (c > 0) {
             k++;
@@ -30,13 +38,19 @@
             let i = t*c;
             let d = r - i;
             let ct = c - r + t*c;
+            if (ct < 0) {ct = 0; d = c;}
             ia += i;
             da += d;
             document.getElementById("tabout").innerHTML += "<tr><td> "+ a +" anni e </td><td>"+ m + " mesi </td><td> "+ parseInt(i*100)/100 +" </td><td> "+ parseInt(d*100)/100+" </td><td> "+ parseInt(ct*100)/100 +" </td></tr>";
-            if (m == 0) {
+            if (m == 0 || ct == 0) {
                 document.getElementById("tabout").innerHTML += "<tr style='color: green; font-weight: bold; background-color: lightgray;'><td> Resoconto </td><td> annuo </td><td> "+ parseInt(ia*100)/100 +" </td><td> "+ parseInt(da*100)/100+" </td><td> "+ parseInt(ct*100)/100 +" </td></tr>";
+                ic += ia;
+                dc += da;
                 ia = 0;
                 da = 0;
+                if (ct == 0) {
+                    document.getElementById("tabout").innerHTML += "<tr style='color: red; font-weight: bold; background-color: lightgray;'><td> Resoconto </td><td> complessivo </td><td> "+ parseInt(ic*100)/100 +" </td><td> "+ parseInt(dc*100)/100+" </td><td> "+ parseInt(ct*100)/100 +" </td></tr>";                    
+                }
             }
             c = ct;
         }
@@ -44,10 +58,11 @@
 </script>
 <body>
     <table>
-        <tr><td>Importo richiesto</td><td><input id="importo" type="number"></td></tr>
-        <tr><td>Tasso di interesse</td><td><input id="tasso" type="number"></td></tr>
-        <tr><td>Importo rata</td><td><input id="rata" type="number"></td><td><button onclick="calc();">Invia</button></td></tr>
-        <tr><td>Numero rate</td><td><input id="rate" type="number"></td></tr>
+        <tr><td>Importo richiesto</td><td><input id="importo" type="number" step="5000"></td><td style="text-align:left;"> € </td></tr>
+        <tr><td>Tasso di interesse</td><td><input id="tasso" type="number" step=".01"></td><td style="text-align:left;"> % </td></tr>
+        <tr><td>Importo rata</td><td><input id="rata" type="number" step="50"></td><td><button onclick="setVars();calc();">Calcola piano di ammortamento</button></td></tr>
+        <tr><td>oppure</td></tr>
+        <tr><td>Durata in anni</td><td><input id="anni" type="number"></td><td><button onclick="setVars();calcRata();calc();">Calcola piano di ammortamento</button></td></tr>
     </table><br>
     <div id="output"><table id="tabout"></table></div>
 </body>
